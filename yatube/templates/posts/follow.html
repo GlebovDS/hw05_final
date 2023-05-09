@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Новости по подпискам
+{% endblock %}
+
+{% block content %}
+  {% include 'posts/includes/switcher.html' %}
+
+  {% for post in page_obj %}
+    <article>
+      {% include 'includes/publication.html' %}
+      {% if post.group %}
+        <br>
+        <a href="{%url 'posts:group_list' post.group.slug %}">все записи группы</a>
+      {% endif %}
+      {% if not forloop.last %}<hr>{% endif %}
+    </article>
+  {% endfor %}
+
+  {% include 'posts/includes/paginator.html' %}
+
+{% endblock %}

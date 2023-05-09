@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Здесь будет информация о группах проекта Yatube
+{% endblock %}
+
+{% block content %}
+  <h1>{{ group.title }}</h1>
+  <p>
+    {{ group.description }}
+  </p>
+  {% for post in page_obj %}
+    <article>
+      {% include 'includes/publication.html' %}
+      {% if not forloop.last %}<hr>{% endif %}
+    </article>
+  {% endfor %}
+
+  {% include 'posts/includes/paginator.html' %}
+
+{% endblock %}
