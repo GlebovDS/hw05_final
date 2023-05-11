@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
 
-{% block title %}
-Новый пост
-{% endblock %}
+{% block title %}Новый пост{% endblock %}
 
 {% block content %}
     <div class="row justify-content-center">  
@@ -17,10 +15,10 @@
             <form method="post" enctype="multipart/form-data">
               {% csrf_token %}
               {% for field in form %}
-              <input type="hidden" name="csrfmiddlewaretoken" value="">            
+              {% csrf_token %}
               <div class="form-group row my-3 p-3">
                 <label for="{{ field.id_for_label }}">
-                  {{field.label_tag}}
+                  {{ field.label_tag }}
                   {% if field.field.required %}                  
                     <span class="required text-danger" >*</span>
                   {% endif %}
@@ -43,7 +41,6 @@
                   {% endif %}
                 </button>
               </div>
-              {#% endfor %#}
             </form>
           </div>
         </div>

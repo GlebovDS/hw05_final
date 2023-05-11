@@ -76,7 +76,6 @@ class PostImageAddTests(TestCase):
             data=form_data,
             follow=True
         )
-        cache.clear()
         # Проверяем, увеличилось ли число постов
         self.assertEqual(Post.objects.count(), posts_count + 1)
         latest_post = Post.objects.latest('id')

@@ -19,7 +19,7 @@ class FollowingTests(TestCase):
     def test_following(self):
         """
         Авторизованный пользователь может подписываться на
-        других пользователей и удалять их из подписок.
+        других пользователей.
         """
         count = Follow.objects.count()
         self.authorized_client.get(
@@ -36,7 +36,18 @@ class FollowingTests(TestCase):
             ).exists()
         )
         self.assertEqual(Follow.objects.count(), count + 1)
-        # Удаляем подписку и проверяем ее отсутствие
+
+    def test_unfollowing(self):
+        """
+        Авторизованный пользователь может отписываться от
+        других пользователей.
+        """
+        # Создаю проверочную подписку
+        Follow.objects.get_or_create(
+            user=self.user_1,
+            author=self.user_2)
+        count = Follow.objects.count()
+        # Удаляю подписку и проверяю ее отсутствие
         self.authorized_client.get(
             reverse(
                 'posts:profile_unfollow',
@@ -49,7 +60,7 @@ class FollowingTests(TestCase):
                 author=self.user_2
             ).exists()
         )
-        self.assertEqual(Follow.objects.count(), count)
+        self.assertEqual(Follow.objects.count(), count - 1)
 
     def test_new_posts_in_feed(self):
         """

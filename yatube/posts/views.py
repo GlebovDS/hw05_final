@@ -40,15 +40,10 @@ def group_posts(request, slug):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.all()
-    # post_list = group.posts.select_related('group')
-    if author.following:
-        following = True
-    else:
-        following = False
     context = {
         'author': author,
         'page_obj': get_page_object(request, post_list),
-        'following': following,
+        'following': author.following,
     }
     return render(request, 'posts/profile.html', context)
 
@@ -147,7 +142,7 @@ def profile_follow(request, username):
 def profile_unfollow(request, username):
     # Отписка
     author = get_object_or_404(User, username=username)
-    Follow.objects.get(
+    Follow.objects.filter(
         user=request.user,
         author=author
     ).delete()

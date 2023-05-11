@@ -9,14 +9,14 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ('text', 'group', 'image')
         labels = {
-            'text': ('Текст'),
-            'group': ('Группа'),
-            'image': ('Картина')
+            'text': 'Текст',
+            'group': 'Группа',
+            'image': 'Картинка'
         }
         help_texts = {
-            'text': ('Текст вашего поста нужно писать здесь'),
-            'group': ('Группа, к которой относится этот пост'),
-            'image': ('Дополните свой пост картинкой')
+            'text': 'Текст вашего поста нужно писать здесь',
+            'group': 'Группа, к которой относится этот пост',
+            'image': 'Дополните свой пост картинкой'
         }
 
 
@@ -26,8 +26,8 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ('text',)
         labels = {
-            'text': ('Комментарий'),
+            'text': 'Комментарий',
         }
         help_texts = {
-            'text': ('Напишите свой комментарий'),
+            'text': 'Напишите свой комментарий',
         }

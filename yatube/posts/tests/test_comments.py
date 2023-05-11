@@ -31,40 +31,63 @@ class CommentsTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
-    def test_comment(self):
+    def test_guest_can_not_to_comment(self):
         """
-        Проверка на: комментировать посты может только
-        авторизованный пользователь.
+        Неавтор-ный пользователь (гость) не может
+        оставлять комменты, редиректится на страницу входа
         """
         form_data = {
             'text': 'Тестовый комментарий',
         }
+        response = self.client.post(
+            reverse('posts:add_comment',
+                    kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=True
+        )
+        self.assertTemplateUsed(response, 'users/login.html')
 
-        response_comment_guest = self.client.post(
+    def test_auth_user_can_to_comment(self):
+        """
+        Авторизованный юзер может комментировать,
+        комментарий появляется на странице поста
+        """
+        form_data = {
+            'text': 'Тестовый комментарий',
+        }
+        response = self.authorized_client.post(
             reverse('posts:add_comment',
                     kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True
         )
-        response_comment_auth = self.authorized_client.post(
-            reverse('posts:add_comment',
+        # Проверка редиректа после отправки коммента
+        self.assertRedirects(
+            response,
+            reverse('posts:post_detail',
                     kwargs={'post_id': self.post.id}),
-            data=form_data,
-            follow=True
         )
-        guest_context_comment = response_comment_guest.context.get(
-            'comments')
-        auth_context_comment = response_comment_auth.context.get(
-            'comments')[0].text
-        # Неавторизованный пользователь не сможет отправить данные
-        self.assertIsNone(guest_context_comment)
-        # Авторизованный пользователь отправил данные из формы
-        self.assertEqual(auth_context_comment, 'Тестовый комментарий')
-        comment_sent = response_comment_auth.context.get('comments')[0]
-        response_get = self.authorized_client.get(
+        # Проверка появления комментария на странице
+        self.assertEqual(
+            response.context.get('comments')[0].text,
+            'Тестовый комментарий')
+
+    def test_redir_not_author(self):
+        """
+        Авторизованного пользователя, но не автора, перенаправляет на
+        страницу просмотра поста, при попытке редактировать его
+        """
+        # Создаем и логиним нового юзера
+        self.user_2 = User.objects.create_user(username='Some_User')
+        self.authorized_client_2 = Client()
+        self.authorized_client_2.force_login(self.user_2)
+        response = self.authorized_client_2.get(
+            reverse('posts:post_edit',
+                    kwargs={'post_id': self.post.id})
+        )
+        # Проверяем редирект
+        self.assertRedirects(
+            response,
             reverse('posts:post_detail',
                     kwargs={'post_id': self.post.id})
         )
-        comment_got = response_get.context.get('comments')[0]
-        # Проверка соответствия отправленного комментария полученному
-        self.assertEqual(comment_sent, comment_got)
